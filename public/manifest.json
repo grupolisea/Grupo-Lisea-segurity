@@ -1,0 +1,45 @@
+{
+  "name": "Grupo Lisea - Seguridad Privada",
+  "short_name": "Lisea Security",
+  "description": "Plataforma de Seguridad Privada Profesional",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "background_color": "#09090b",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/escudo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["security", "business"],
+  "lang": "es",
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "Acceso Seguro",
+      "short_name": "Acceso",
+      "description": "Iniciar proceso de acceso seguro",
+      "url": "/",
+      "icons": [{ "src": "/escudo.jpg", "sizes": "96x96" }]
+    }
+  ]
+}
