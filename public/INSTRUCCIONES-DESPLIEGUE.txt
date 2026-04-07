@@ -1,0 +1,147 @@
+═══════════════════════════════════════════════════════════════════════════════
+     🚀 GUÍA DE DESPLIEGUE - GRUPO LISEA SECURITY
+═══════════════════════════════════════════════════════════════════════════════
+
+Tu repositorio GitHub: https://github.com/grupolisea/Grupo-Lisea-segurity
+
+═══════════════════════════════════════════════════════════════════════════════
+     PASO 1: DESCARGAR Y PREPARAR EL PROYECTO
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Descarga el archivo: grupo-lisea-security.zip
+2. Descomprime en tu computadora (ej: C:\Proyectos\grupo-lisea-security)
+3. Abre una terminal en esa carpeta
+
+═══════════════════════════════════════════════════════════════════════════════
+     PASO 2: INSTALAR DEPENDENCIAS
+═══════════════════════════════════════════════════════════════════════════════
+
+Si no tienes Bun, instálalo primero:
+  Windows (PowerShell):  irm bun.sh/install.ps1 | iex
+  Mac/Linux:            curl -fsSL https://bun.sh/install | bash
+
+Luego ejecuta:
+  bun install
+
+═══════════════════════════════════════════════════════════════════════════════
+     PASO 3: SUBIR A GITHUB
+═══════════════════════════════════════════════════════════════════════════════
+
+Ejecuta estos comandos en la terminal:
+
+git init
+git add .
+git commit -m "Initial commit - Sistema de Seguridad Grupo Lisea"
+git remote add origin https://github.com/grupolisea/Grupo-Lisea-segurity.git
+git branch -M main
+git push -u origin main
+
+═══════════════════════════════════════════════════════════════════════════════
+     PASO 4: CONFIGURAR SUPABASE (BASE DE DATOS)
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Ve a Supabase: https://supabase.com
+2. Abre tu proyecto: grupo-lisea-security
+3. Ve a Settings → Database
+4. Busca "Connection string" → Selecciona "URI"
+5. Copia la URL (se ve algo así):
+   postgresql://postgres.xxxxx:PASSWORD@aws-0-region.pooler.supabase.com:6543/postgres
+
+6. También copia la URL directa (Connection string → Transaction):
+   postgresql://postgres.xxxxx:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres
+
+═══════════════════════════════════════════════════════════════════════════════
+     PASO 5: CONFIGURAR VERCEL
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Ve a Vercel: https://vercel.com
+2. Abre tu proyecto: grupo-lisea-security
+3. Ve a Settings → Environment Variables
+4. Agrega estas 4 variables:
+
+┌─────────────────────┬──────────────────────────────────────────────────────┐
+│ VARIABLE            │ VALOR                                                │
+├─────────────────────┼──────────────────────────────────────────────────────┤
+│ DATABASE_URL        │ postgresql://postgres.xxxx:PASS@...pooler.supabase...│
+│ DIRECT_DATABASE_URL │ postgresql://postgres.xxxx:PASS@...supabase...:5432/ │
+│ ENCRYPTION_KEY      │ lisea-security-2024-ultra-secure-key-pro             │
+│ HMAC_KEY            │ lisea-hmac-signature-key-2024-secure                 │
+└─────────────────────┴──────────────────────────────────────────────────────┘
+
+IMPORTANTE:
+- DATABASE_URL usa puerto 6543 (pooler)
+- DIRECT_DATABASE_URL usa puerto 5432 (directo)
+
+5. Ve a Deployments → Haz clic en "Redeploy"
+
+═══════════════════════════════════════════════════════════════════════════════
+     PASO 6: CREAR TABLAS EN SUPABASE
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Ve a Supabase → SQL Editor
+2. Ejecuta este script:
+
+CREATE TABLE "SecurityConfig" (
+  "id" TEXT PRIMARY KEY,
+  "passwordHash" TEXT NOT NULL,
+  "protectedUrl" TEXT NOT NULL,
+  "accessLifetime" INTEGER DEFAULT 20,
+  "accessWindow" INTEGER DEFAULT 5,
+  "isActive" BOOLEAN DEFAULT true,
+  "maxDevices" INTEGER DEFAULT 3,
+  "createdAt" TIMESTAMP DEFAULT NOW(),
+  "updatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE "AccessToken" (
+  "id" TEXT PRIMARY KEY,
+  "token" TEXT UNIQUE NOT NULL,
+  "userName" TEXT NOT NULL,
+  "ipAddress" TEXT,
+  "userAgent" TEXT,
+  "expiresAt" TIMESTAMP NOT NULL,
+  "isValidated" BOOLEAN DEFAULT false,
+  "createdAt" TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE "AccessLog" (
+  "id" TEXT PRIMARY KEY,
+  "action" TEXT NOT NULL,
+  "userName" TEXT,
+  "ipAddress" TEXT,
+  "userAgent" TEXT,
+  "details" TEXT,
+  "createdAt" TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX "AccessToken_userName_idx" ON "AccessToken"("userName");
+CREATE INDEX "AccessToken_token_idx" ON "AccessToken"("token");
+
+═══════════════════════════════════════════════════════════════════════════════
+     PASO 7: VERIFICAR DESPLIEGUE
+═══════════════════════════════════════════════════════════════════════════════
+
+1. En Vercel, ve a "Deployments"
+2. Espera a que el estado sea "Ready" (verde)
+3. Haz clic en la URL del despliegue
+4. Tu app estará funcionando!
+
+═══════════════════════════════════════════════════════════════════════════════
+     TUS ENLACES IMPORTANTES
+═══════════════════════════════════════════════════════════════════════════════
+
+GitHub:    https://github.com/grupolisea/Grupo-Lisea-segurity
+Vercel:    https://vercel.com/grupo-lisea-projects/grupo-lisea-security
+Supabase:  https://supabase.com/dashboard/project/wkuesxirykksvckfbiyq
+
+═══════════════════════════════════════════════════════════════════════════════
+     CONTRASEÑA DEL PANEL ADMIN
+═══════════════════════════════════════════════════════════════════════════════
+
+Para acceder al panel de administración:
+- Toca el escudo 5 veces
+- Contraseña: LiseaAdmin2026!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+© 2026 Grupo Lisea - Seguridad Privada Profesional
