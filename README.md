@@ -1,127 +1,280 @@
 # 🔐 Grupo Lisea - Sistema de Acceso Seguro
 
+<div align="center">
+
+![Grupo Lisea](https://img.shields.io/badge/Grupo%20Lisea-Seguridad%20Privada-amber?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
+![PWA](https://img.shields.io/badge/PWA-Ready-purple?style=for-the-badge)
+
 **Plataforma de Seguridad Privada Profesional**
 
-Sistema PWA de protección de acceso con control de dispositivos, cifrado profesional y panel de administración.
+Sistema PWA de protección de acceso con control de dispositivos y panel de administración.
+
+[Ver Demo](https://grupo-lisea-segurity.vercel.app) · [Reportar Bug](https://github.com/grupolisea/Grupo-Lisea-segurity/issues) · [Solicitar Feature](https://github.com/grupolisea/Grupo-Lisea-segurity/issues)
+
+</div>
 
 ---
 
-## ✨ Características
+## 📋 Descripción
 
-- 🔒 **PWA Obligatoria** - El enlace protegido nunca es visible
-- 📱 **Solo Móvil/Tablet** - Bloqueo automático de desktop
-- 👥 **3 Dispositivos por Usuario** - Control de acceso estricto
-- 🔐 **Cifrado AES-256** - Seguridad de nivel profesional
-- 🔔 **Notificaciones Push** - Alertas en tiempo real
-- 📷 **Permisos de Cámara/Micrófono** - Para aplicaciones de seguridad
-- ⚙️ **Panel Admin** - Gestión completa de dispositivos
-- 🗄️ **PostgreSQL (Supabase)** - Base de datos escalable
+**Grupo Lisea Seguridad** es una aplicación web progresiva (PWA) diseñada para proteger el acceso a contenido sensible mediante un sistema de seguridad multicapa. La aplicación garantiza que solo usuarios autorizados en dispositivos móviles/tablets puedan acceder al contenido protegido.
 
----
-
-## 🛠️ Tecnologías
-
-- **Next.js 16** - Framework React
-- **Prisma** - ORM de base de datos
-- **PostgreSQL (Supabase)** - Base de datos en la nube
-- **Tailwind CSS** - Estilos
-- **shadcn/ui** - Componentes UI
-- **PWA** - Progressive Web App
+### 🎯 Caso de Uso Principal
+Protección de aplicaciones internas de seguridad privada, donde el acceso debe estar restringido a:
+- Dispositivos móviles y tablets únicamente
+- Usuarios previamente registrados
+- Máximo 3 dispositivos por nombre de usuario
 
 ---
 
-## 🚀 Despliegue en Vercel + Supabase
+## ✨ Características Principales
 
-### PASO 1: Crear proyecto en Supabase
+| Característica | Descripción |
+|---------------|-------------|
+| 🔒 **PWA Obligatoria** | El contenido protegido nunca es visible en el navegador; requiere instalación de la app |
+| 📱 **Solo Móvil/Tablet** | Bloqueo automático de equipos de escritorio (desktop) |
+| 👥 **Control de Dispositivos** | Límite de 3 dispositivos por nombre de usuario |
+| 🔐 **Cifrado AES-256** | Seguridad de nivel profesional para tokens de acceso |
+| 🔔 **Notificaciones Push** | Alertas en tiempo real mediante Service Worker |
+| 📷 **Permisos Integrados** | Solicitud de cámara y micrófono para aplicaciones de seguridad |
+| ⚙️ **Panel Admin** | Gestión completa de dispositivos registrados |
+| 🎨 **UI Profesional** | Interfaz moderna con tema oscuro y acentos dorados |
 
-1. Ve a [supabase.com](https://supabase.com)
-2. Crea una cuenta y una organización
-3. Crea un nuevo proyecto llamado `grupo-lisea-security`
-4. Espera a que se cree la base de datos
+---
 
-### PASO 2: Obtener URLs de conexión
+## 🛡️ Flujo de Seguridad
 
-1. En el dashboard de Supabase, haz clic en **"Conectar"**
-2. Busca la sección **"Session pooler"** y copia la URI
-3. También copia la URI de **"Transaction pooler"** (puerto 5432)
+```
+┌─────────────────┐
+│  Usuario accede │
+└────────┬────────┘
+         ▼
+┌─────────────────┐     NO      ┌──────────────────┐
+│  ¿Es móvil?     │────────────▶│  BLOQUEADO       │
+└────────┬────────┘             │  (Desktop)       │
+         │ SÍ                   └──────────────────┘
+         ▼
+┌─────────────────┐     NO      ┌──────────────────┐
+│  ¿PWA instalada?│────────────▶│  INSTALAR APP    │
+└────────┬────────┘             │  (Instrucciones) │
+         │ SÍ                   └──────────────────┘
+         ▼
+┌─────────────────┐     NO      ┌──────────────────┐
+│  ¿Dispositivos  │────────────▶│  REGISTRO        │
+│  disponibles?   │             │  (Nuevo usuario) │
+└────────┬────────┘             └──────────────────┘
+         │ SÍ
+         ▼
+┌─────────────────┐
+│  ✅ ACCESO      │
+│  (Contenido     │
+│   protegido)    │
+└─────────────────┘
+```
 
-### PASO 3: Desplegar en Vercel
+---
 
-1. Ve a [vercel.com](https://vercel.com)
+## 🛠️ Stack Tecnológico
+
+### Frontend
+- **[Next.js 16.1.1](https://nextjs.org/)** - Framework React con App Router
+- **[TypeScript 5](https://www.typescriptlang.org/)** - Tipado estático
+- **[Tailwind CSS 4](https://tailwindcss.com/)** - Estilos utilitarios
+- **[shadcn/ui](https://ui.shadcn.com/)** - Componentes UI accesibles
+- **[Lucide Icons](https://lucide.dev/)** - Iconografía
+- **[Framer Motion](https://www.framer.com/motion/)** - Animaciones
+
+### Backend & Storage
+- **API Routes** - Endpoints serverless
+- **In-Memory Store** - Almacenamiento en memoria (sin base de datos externa)
+
+### PWA
+- **Service Worker** - Cache y notificaciones
+- **Web App Manifest** - Instalación en dispositivos
+
+---
+
+## 🚀 Despliegue Rápido
+
+### Opción 1: Vercel (Recomendado)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/grupolisea/Grupo-Lisea-segurity)
+
+1. Haz clic en el botón de arriba
 2. Conecta tu cuenta de GitHub
-3. Importa el repositorio `grupo-lisea-security`
-4. Agrega las variables de entorno:
-   - `DATABASE_URL` = URL del Session pooler (puerto 6543) + `?pgbouncer=true`
-   - `DIRECT_DATABASE_URL` = URL del Transaction pooler (puerto 5432)
-5. Haz clic en **"Deploy"**
+3. Haz clic en **Deploy**
+4. ¡Listo! Tu aplicación estará disponible en minutos
 
-### PASO 4: Ejecutar migraciones
-
-Después del primer deploy, ejecuta:
+### Opción 2: Manual
 
 ```bash
-npx prisma db push
-```
+# 1. Clonar el repositorio
+git clone https://github.com/grupolisea/Grupo-Lisea-segurity.git
 
-O en Vercel, ve a la pestaña **Storage** → **Prisma** y ejecuta las migraciones.
+# 2. Entrar al directorio
+cd Grupo-Lisea-segurity
 
----
-
-## 📱 Uso
-
-1. Acceder desde **móvil o tablet**
-2. **Instalar la PWA** (obligatorio)
-3. Registrar **nombre de usuario**
-4. Acceder al **contenido protegido**
-
-### Panel Admin
-- Tocar el escudo **5 veces**
-- Contraseña: `LiseaAdmin2026!`
-
----
-
-## 🔧 Variables de Entorno
-
-```env
-# Base de datos Supabase (PostgreSQL)
-DATABASE_URL="postgresql://postgres.xxxxx:PASSWORD@aws-0-region.pooler.supabase.com:6543/postgres?pgbouncer=true"
-DIRECT_DATABASE_URL="postgresql://postgres.xxxxx:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres"
-
-# Claves de encriptación (opcional)
-ENCRYPTION_KEY="tu-clave-de-encriptacion"
-HMAC_KEY="tu-clave-hmac"
-```
-
----
-
-## 📋 Desarrollo Local
-
-```bash
-# Clonar repositorio
-git clone https://github.com/TU_USUARIO/grupo-lisea-security.git
-
-# Instalar dependencias
+# 3. Instalar dependencias
 bun install
+# o con npm
+npm install
 
-# Configurar variables de entorno
-cp .env.example .env
-# Edita .env con tus credenciales de Supabase
-
-# Crear tablas en la base de datos
-bun run db:push
-
-# Iniciar servidor de desarrollo
+# 4. Iniciar en desarrollo
 bun run dev
+# o
+npm run dev
+
+# 5. Abrir http://localhost:3000
 ```
+
+---
+
+## 📱 Uso de la Aplicación
+
+### Para Usuarios
+
+1. **Acceder desde móvil o tablet** (desktop está bloqueado)
+2. **Instalar la PWA** siguiendo las instrucciones en pantalla
+3. **Registrar nombre de usuario** (mínimo 2 caracteres)
+4. **Acceder al contenido protegido**
+
+### Para Administradores
+
+1. Tocar el **escudo del logo 5 veces** seguidas
+2. Ingresar la contraseña de administrador
+3. Gestionar dispositivos:
+   - Ver dispositivos registrados
+   - Buscar por nombre de usuario
+   - Eliminar dispositivos individuales
+   - Eliminar todos los dispositivos de un usuario
+   - Eliminar todos los dispositivos
+
+**Contraseña de administrador:** `LiseaAdmin2026!`
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+grupo-lisea-security/
+├── 📁 public/                 # Archivos estáticos
+│   ├── 📄 manifest.json       # PWA manifest
+│   ├── 📄 sw.js              # Service Worker
+│   ├── 🖼️ escudo.jpg         # Logo
+│   └── 🖼️ icon-*.png         # Iconos PWA
+├── 📁 src/
+│   ├── 📁 app/               # App Router
+│   │   ├── 📄 page.tsx       # Página principal
+│   │   ├── 📄 layout.tsx     # Layout raíz
+│   │   ├── 📄 globals.css    # Estilos globales
+│   │   └── 📁 api/           # API Routes
+│   │       ├── 📁 access/    # Validación de acceso
+│   │       ├── 📁 admin/     # Panel de administración
+│   │       ├── 📁 proxy/     # Proxy de contenido
+│   │       ├── 📁 token/     # Generación de tokens
+│   │       └── 📁 verify/    # Verificación de dispositivo
+│   ├── 📁 components/        # Componentes React
+│   │   └── 📁 ui/            # Componentes shadcn/ui
+│   ├── 📁 hooks/             # Custom hooks
+│   └── 📁 lib/               # Utilidades y store
+├── 📄 package.json           # Dependencias
+├── 📄 next.config.ts         # Configuración Next.js
+├── 📄 tailwind.config.ts     # Configuración Tailwind
+└── 📄 tsconfig.json          # Configuración TypeScript
+```
+
+---
+
+## 🔌 API Endpoints
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/token` | POST | Generar token de acceso |
+| `/api/access` | POST | Validar token y obtener URL |
+| `/api/verify` | GET | Verificar estado del dispositivo |
+| `/api/admin/devices` | GET | Listar dispositivos (admin) |
+| `/api/admin/devices` | DELETE | Eliminar dispositivos (admin) |
+| `/api/proxy` | GET | Proxy para contenido protegido |
+
+---
+
+## ⚙️ Configuración
+
+### Cambiar URL Protegida
+
+Edita el archivo `src/lib/store.ts`:
+
+```typescript
+const DEFAULT_CONFIG = {
+  protectedUrl: "https://tu-url-protegida.com",
+  maxDevicesPerUser: 3,
+  adminPassword: "TuContraseñaSegura!",
+};
+```
+
+### Cambiar Límite de Dispositivos
+
+Modifica `maxDevicesPerUser` en la configuración.
+
+---
+
+## 🔒 Consideraciones de Seguridad
+
+- ✅ Los tokens expiran automáticamente
+- ✅ Fingerprinting del dispositivo para prevenir duplicados
+- ✅ Validación de modo PWA antes de acceder
+- ✅ Bloqueo de user agents de escritorio
+- ✅ El contenido protegido se carga en iframe con sandbox
+
+---
+
+## 📊 Estado del Proyecto
+
+| Estado | Descripción |
+|--------|-------------|
+| ✅ Producción | Desplegado en Vercel |
+| ✅ PWA | Service Worker activo |
+| ✅ Responsive | Diseño móvil-first |
+| ✅ Accesibilidad | Componentes accesibles |
+
+---
+
+## 🤝 Contribuir
+
+Las contribuciones son bienvenidas:
+
+1. Fork del repositorio
+2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit de cambios (`git commit -m 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abrir Pull Request
 
 ---
 
 ## 📄 Licencia
 
-© 2026 Grupo Lisea - Seguridad Privada Profesional
+© 2026 **Grupo Lisea** - Seguridad Privada Profesional
+
+Todos los derechos reservados. Este software es propiedad de Grupo Lisea y su uso está restringido a fines autorizados.
 
 ---
 
-## 👥 Soporte
+## 👥 Contacto
 
-Para soporte técnico, contactar a Grupo Lisea.
+**Grupo Lisea - Seguridad Privada Profesional**
+
+- 📧 Email: contacto@grupolisea.com
+- 🌐 Web: [grupolisea.com](https://grupolisea.com)
+- 💼 GitHub: [@grupolisea](https://github.com/grupolisea)
+
+---
+
+<div align="center">
+
+**Desarrollado con ❤️ para Grupo Lisea**
+
+![Footer](https://img.shields.io/badge/Seguridad-Profesional-amber?style=flat-square)
+
+</div>
