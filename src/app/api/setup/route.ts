@@ -1,60 +1,46 @@
-import { db } from "@/lib/db";
-import { NextResponse } from "next/server";
-import crypto from "crypto";
+import { NextRequest, NextResponse } from "next/server";
+import { getConfig, updateConfig, verifyAdminPassword, hashPassword } from "@/lib/store";
 
-// Función para hashear contraseña
-function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password).digest("hex");
-}
-
-// Función para encriptar URL
-function encryptUrl(url: string): string {
-  const key = process.env.ENCRYPTION_KEY || "lisea-security-key-2024";
-  const cipher = crypto.createCipheriv(
-    "aes-256-cbc",
-    crypto.createHash("sha256").update(key).digest(),
-    Buffer.alloc(16, 0)
-  );
-  let encrypted = cipher.update(url, "utf8", "hex");
-  encrypted += cipher.final("hex");
-  return encrypted;
-}
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { password, protectedUrl, accessLifetime, accessWindow } = body;
+    const { password, protectedUrl, accessLifetime, accessWindow, maxDevices } = body;
 
-    // Verificar si ya existe configuración
-    const existingConfig = await db.securityConfig.findFirst();
-
-    if (existingConfig) {
-      // Actualizar configuración existente
-      const updated = await db.securityConfig.update({
-        where: { id: existingConfig.id },
-        data: {
-          passwordHash: hashPassword(password),
-          protectedUrl: encryptUrl(protectedUrl),
-          accessLifetime: accessLifetime || 20,
-          accessWindow: accessWindow || 5,
-          isActive: true,
-        },
-      });
-      return NextResponse.json({ success: true, configId: updated.id });
+    if (!verifyAdminPassword(password)) {
+      return NextResponse.json(
+        { error: "Contraseña incorrecta" },
+        { status: 401 }
+      );
     }
 
-    // Crear nueva configuración
-    const config = await db.securityConfig.create({
-      data: {
-        passwordHash: hashPassword(password),
-        protectedUrl: encryptUrl(protectedUrl),
-        accessLifetime: accessLifetime || 20,
-        accessWindow: accessWindow || 5,
+    const updates: Record<string, unknown> = {};
+
+    if (protectedUrl) {
+      updates.protectedUrl = protectedUrl;
+    }
+    if (accessLifetime) {
+      updates.accessLifetime = Number(accessLifetime);
+    }
+    if (accessWindow) {
+      updates.accessWindow = Number(accessWindow);
+    }
+    if (maxDevices) {
+      updates.maxDevices = Number(maxDevices);
+    }
+
+    const config = updateConfig(updates);
+
+    return NextResponse.json({
+      success: true,
+      config: {
+        protectedUrl: config.protectedUrl,
+        accessLifetime: config.accessLifetime,
+        accessWindow: config.accessWindow,
+        maxDevices: config.maxDevices,
       },
     });
-
-    return NextResponse.json({ success: true, configId: config.id });
-  } catch {
+  } catch (error) {
+    console.error("Setup error:", error);
     return NextResponse.json(
       { error: "Error al configurar el sistema" },
       { status: 500 }
@@ -64,14 +50,13 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const config = await db.securityConfig.findFirst();
-    if (!config) {
-      return NextResponse.json({ configured: false });
-    }
+    const config = getConfig();
     return NextResponse.json({
       configured: true,
+      protectedUrl: config.protectedUrl,
       accessWindow: config.accessWindow,
       accessLifetime: config.accessLifetime,
+      maxDevices: config.maxDevices,
     });
   } catch {
     return NextResponse.json(
