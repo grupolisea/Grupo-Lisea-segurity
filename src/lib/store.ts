@@ -1,25 +1,25 @@
-import { NextResponse } from "next/server";
 import crypto from "crypto";
 
-// Almacenamiento en memoria (se reinicia en cada deploy, pero funciona para uso básico)
-// Para producción persistente, se puede migrar a Vercel KV, Upstash, etc.
-
+// Interface para dispositivo
 interface Device {
   id: string;
   userName: string;
   token: string;
   fingerprint: string;
   userAgent: string;
+  ipAddress: string;
   createdAt: Date;
+  lastAccessAt: Date;
   isValidated: boolean;
 }
 
+// Interface para configuración
 interface Config {
   passwordHash: string;
   protectedUrl: string;
   accessLifetime: number;
   accessWindow: number;
-  maxDevices: number;
+  maxDevicesPerUser: number;
   isActive: boolean;
 }
 
@@ -39,15 +39,13 @@ const config = globalThis.liseaConfig || {
   protectedUrl: "https://guardian-qr-suite.emergent.host",
   accessLifetime: 20,
   accessWindow: 5,
-  maxDevices: 3,
+  maxDevicesPerUser: 3,
   isActive: true,
 };
 globalThis.liseaConfig = config;
 
-// Contraseña de administrador
 const ADMIN_PASSWORD = "LiseaAdmin2026!";
 
-// Funciones de utilidad
 export function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
 }
@@ -64,16 +62,70 @@ export function getDevices(): Device[] {
   return devices;
 }
 
-export function addDevice(device: Omit<Device, "id" | "token" | "createdAt" | "isValidated">): Device {
+export function getDeviceByToken(token: string): Device | undefined {
+  return devices.find(d => d.token === token);
+}
+
+export function getDeviceByFingerprint(fingerprint: string): Device | undefined {
+  return devices.find(d => d.fingerprint === fingerprint);
+}
+
+export function getDeviceByTokenAndFingerprint(token: string, fingerprint: string): Device | undefined {
+  return devices.find(d => d.token === token && d.fingerprint === fingerprint);
+}
+
+export function countDevicesByUser(userName: string): number {
+  return devices.filter(d => d.userName === userName).length;
+}
+
+export function findExistingDevice(fingerprint: string): Device | undefined {
+  return devices.find(d => d.fingerprint === fingerprint);
+}
+
+export function addDevice(
+  deviceData: {
+    userName: string;
+    fingerprint: string;
+    userAgent: string;
+    ipAddress?: string;
+  }
+): { success: boolean; device?: Device; error?: string } {
+  const { userName, fingerprint, userAgent, ipAddress } = deviceData;
+  
+  const existingDevice = findExistingDevice(fingerprint);
+  if (existingDevice) {
+    return { success: true, device: existingDevice };
+  }
+  
+  const currentCount = countDevicesByUser(userName);
+  if (currentCount >= config.maxDevicesPerUser) {
+    return {
+      success: false,
+      error: `Límite alcanzado: Ya tiene ${config.maxDevicesPerUser} dispositivos registrados`,
+    };
+  }
+  
   const newDevice: Device = {
-    ...device,
     id: crypto.randomBytes(8).toString("hex"),
+    userName: userName.trim(),
     token: generateToken(),
+    fingerprint,
+    userAgent: userAgent || "Unknown",
+    ipAddress: ipAddress || "Unknown",
     createdAt: new Date(),
+    lastAccessAt: new Date(),
     isValidated: true,
   };
+  
   devices.push(newDevice);
-  return newDevice;
+  return { success: true, device: newDevice };
+}
+
+export function updateLastAccess(deviceId: string): void {
+  const device = devices.find(d => d.id === deviceId);
+  if (device) {
+    device.lastAccessAt = new Date();
+  }
 }
 
 export function removeDevice(deviceId: string): boolean {
@@ -109,19 +161,30 @@ export function updateConfig(newConfig: Partial<Config>): Config {
 }
 
 export function getStats() {
+  const uniqueUsers = new Set(devices.map(d => d.userName));
   return {
     total: devices.length,
     validated: devices.filter(d => d.isValidated).length,
-    maxDevices: config.maxDevices,
+    totalUsers: uniqueUsers.size,
+    maxDevicesPerUser: config.maxDevicesPerUser,
   };
 }
 
-export function countDevicesByUser(userName: string): number {
-  return devices.filter(d => d.userName === userName).length;
-}
-
-export function getDeviceByToken(token: string): Device | undefined {
-  return devices.find(d => d.token === token);
+export function getUserStats(userName: string) {
+  const userDevices = devices.filter(d => d.userName === userName);
+  return {
+    userName,
+    deviceCount: userDevices.length,
+    maxDevices: config.maxDevicesPerUser,
+    available: config.maxDevicesPerUser - userDevices.length,
+    devices: userDevices.map(d => ({
+      id: d.id,
+      createdAt: d.createdAt,
+      lastAccessAt: d.lastAccessAt,
+      userAgent: d.userAgent,
+    })),
+  };
 }
 
 export { ADMIN_PASSWORD, devices, config };
+export type { Device, Config };
