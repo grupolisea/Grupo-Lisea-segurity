@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getConfig, updateConfig, verifyAdminPassword, hashPassword } from "@/lib/store";
+import { getConfig, updateConfig, verifyAdminPassword } from "@/lib/store";
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       updates.accessWindow = Number(accessWindow);
     }
     if (maxDevices) {
-      updates.maxDevices = Number(maxDevices);
+      updates.maxDevicesPerUser = Number(maxDevices);
     }
 
     const config = updateConfig(updates);
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         protectedUrl: config.protectedUrl,
         accessLifetime: config.accessLifetime,
         accessWindow: config.accessWindow,
-        maxDevices: config.maxDevices,
+        maxDevices: config.maxDevicesPerUser,
       },
     });
   } catch (error) {
@@ -56,7 +56,7 @@ export async function GET() {
       protectedUrl: config.protectedUrl,
       accessWindow: config.accessWindow,
       accessLifetime: config.accessLifetime,
-      maxDevices: config.maxDevices,
+      maxDevices: config.maxDevicesPerUser,
     });
   } catch {
     return NextResponse.json(
