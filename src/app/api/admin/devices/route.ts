@@ -9,6 +9,8 @@ import {
   getConfig,
 } from "@/lib/store";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -36,13 +38,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      maxDevices: config.maxDevices,
+      maxDevices: config.maxDevicesPerUser,
       stats,
       devices: devices.map((d) => ({
         id: d.id,
         userName: d.userName,
         tokenPreview: d.token.substring(0, 8) + "...",
         userAgent: d.userAgent || "N/A",
+        ipAddress: d.ipAddress || "N/A",
         createdAt: d.createdAt.toISOString(),
         isValidated: d.isValidated,
       })),
