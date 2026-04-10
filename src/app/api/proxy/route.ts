@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getConfig, verifyAdminPassword } from "@/lib/store";
-export const dynamic = 'force-dynamic'
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,7 +9,10 @@ export async function GET(request: NextRequest) {
     const password = searchParams.get("password");
 
     if (!password || !verifyAdminPassword(password)) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+      return NextResponse.json(
+        { error: "No autorizado" },
+        { status: 401 }
+      );
     }
 
     const config = getConfig();
@@ -18,10 +22,13 @@ export async function GET(request: NextRequest) {
       protectedUrl: config.protectedUrl,
       accessLifetime: config.accessLifetime,
       accessWindow: config.accessWindow,
-      maxDevices: config.maxDevices,
+      maxDevices: config.maxDevicesPerUser,
     });
   } catch (error) {
     console.error("Proxy error:", error);
-    return NextResponse.json({ error: "Error del servidor" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error del servidor" },
+      { status: 500 }
+    );
   }
 }
